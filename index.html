@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý SIM Trắng Vinaphone</title>
+    <meta name="description" content="Hệ thống quản lý danh sách SIM trắng Vinaphone – theo dõi trạng thái, phân loại eSIM/Vật lý, đồng bộ Cloud.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-title-container">
+                <h1>Quản Lý SIM Trắng</h1>
+                <p>Phân loại eSIM / Vật lý · Theo dõi trạng thái · Đồng bộ Cloud</p>
+            </div>
+        </header>
+
+        <!-- Stats Overview -->
+        <div class="stats-row">
+            <div class="stat-box available">
+                <span class="stat-label">Tổng chưa dùng</span>
+                <span class="stat-value" id="stat-total-available">0</span>
+            </div>
+            <div class="stat-box esim" id="box-esim">
+                <span class="stat-label">eSIM chưa dùng</span>
+                <span class="stat-value" id="stat-esim-available">0</span>
+                <span id="warn-esim" class="warn-badge" style="display: none;"></span>
+            </div>
+            <div class="stat-box physical" id="box-physical">
+                <span class="stat-label">Vật lý chưa dùng</span>
+                <span class="stat-value" id="stat-physical-available">0</span>
+                <span id="warn-physical" class="warn-badge" style="display: none;"></span>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            
+            <!-- Left: Import Panel -->
+            <div class="glass-card">
+                <h2 class="section-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Nhập SIM Mới
+                </h2>
+                
+                <form id="sim-form">
+                    <div class="form-group">
+                        <label class="form-label" for="sim-input">Danh sách SIM hoặc dải số (Serial):</label>
+                        <textarea class="form-control" id="sim-input" placeholder="Ví dụ:&#10;8984020001001234501-10&#10;8984020001001234599&#10;Nhập mỗi số hoặc dải trên một dòng." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Loại SIM:</label>
+                        <div class="type-toggle-group">
+                            <div>
+                                <input type="radio" id="type-esim" name="sim-type" value="esim" class="type-radio">
+                                <label for="type-esim" class="type-label esim-label">eSIM</label>
+                            </div>
+                            <div>
+                                <input type="radio" id="type-physical" name="sim-type" value="physical" class="type-radio" checked>
+                                <label for="type-physical" class="type-label physical-label">Vật Lý</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Thêm vào kho
+                    </button>
+                </form>
+
+                <!-- Guide -->
+                <div class="guide-box">
+                    <strong>Hướng dẫn nhập dải số:</strong>
+                    <span>Hệ thống tự phát hiện dấu gạch ngang <code>-</code> để tạo dải.</span>
+                    <ul style="margin-left: 1rem; margin-top: 0.2rem; display: flex; flex-direction: column; gap: 0.1rem;">
+                        <li><code>898402...01-10</code> → sinh từ đuôi 01 đến 10</li>
+                        <li><code>1-10</code> → sinh số từ 1 đến 10</li>
+                    </ul>
+                </div>
+
+                <!-- Backup -->
+                <div class="backup-section">
+                    <span style="font-size: 0.72rem; font-weight: 500; color: var(--text-muted);">Dữ liệu & Sao lưu</span>
+                    <div class="backup-buttons">
+                        <button id="btn-export" class="btn-secondary" title="Xuất file .json">Xuất</button>
+                        <button id="btn-import" class="btn-secondary" title="Nhập file .json">Nhập</button>
+                    </div>
+                </div>
+
+                <!-- Cloud Sync -->
+                <div style="margin-top: 1rem; border-top: 1px solid var(--border-subtle); padding-top: 0.75rem;">
+                    <span style="font-size: 0.72rem; font-weight: 500; color: var(--text-muted); display: block; margin-bottom: 0.35rem;">Đồng bộ Cloud (Google Sheets)</span>
+                    <div class="form-group" style="margin-bottom: 0.5rem;">
+                        <input type="password" class="search-input" id="cloud-api-url" placeholder="Dán link Web App Apps Script..." style="padding-left: 0.6rem; font-size: 0.75rem;">
+                    </div>
+                    <div style="display: flex; gap: 0.35rem; margin-bottom: 0.35rem;">
+                        <button id="btn-cloud-pull" class="btn-secondary" style="flex: 1; justify-content: center; font-size: 0.7rem;">Tải về</button>
+                        <button id="btn-cloud-push" class="btn-secondary" style="flex: 1; justify-content: center; font-size: 0.7rem;">Lưu lên</button>
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <label style="display: inline-flex; align-items: center; cursor: pointer; font-size: 0.68rem; color: var(--text-muted);">
+                            <input type="checkbox" id="cloud-auto-sync" style="margin-right: 0.25rem;">
+                            Tự động đồng bộ
+                        </label>
+                        <span id="cloud-sync-status" style="font-size: 0.62rem; color: var(--text-muted);">Chưa liên kết</span>
+                    </div>
+                </div>
+
+                <!-- Activity Log -->
+                <div style="margin-top: 1.25rem; border-top: 1px solid var(--border-subtle); padding-top: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                        <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);">Lịch sử hoạt động</span>
+                        <button id="btn-clear-history" class="btn-text-only" style="font-size: 0.65rem;">Xóa sạch</button>
+                    </div>
+                    <div class="history-list" id="history-list"></div>
+                </div>
+            </div>
+
+            <!-- Right: SIM List -->
+            <div class="glass-card">
+                <!-- Search & Sort Row -->
+                <div class="toolbar" style="margin-bottom: 0.5rem;">
+                    <div class="search-box-container">
+                        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <input type="text" class="search-input" id="search-input" placeholder="Tìm số SIM hoặc Serial...">
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 0.35rem; margin-left: auto;">
+                        <span style="font-size: 0.72rem; color: var(--text-muted); white-space: nowrap;">Sắp xếp:</span>
+                        <select class="search-input" id="sort-select" style="padding: 0.4rem 1.5rem 0.4rem 0.5rem; cursor: pointer; font-size: 0.75rem; width: auto; min-width: 130px;">
+                            <option value="asc">Số: Thấp → Cao</option>
+                            <option value="desc">Số: Cao → Thấp</option>
+                            <option value="newest">Mới nhất trước</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Filter Row -->
+                <div class="toolbar" style="margin-top: 0; border-top: 1px solid var(--border-subtle); padding-top: 0.5rem; margin-bottom: 0.75rem; flex-direction: row; justify-content: flex-start; gap: 0.75rem; flex-wrap: wrap;">
+                    <div class="filters-container">
+                        <button class="filter-btn" data-type="all">Tất cả</button>
+                        <button class="filter-btn active" data-type="esim">eSIM</button>
+                        <button class="filter-btn" data-type="physical">Vật Lý</button>
+                    </div>
+                    <div class="filters-container">
+                        <button class="filter-btn" data-status="all">Tất cả</button>
+                        <button class="filter-btn active" data-status="available">Chưa dùng</button>
+                        <button class="filter-btn" data-status="used">Đã dùng</button>
+                    </div>
+                </div>
+
+                <!-- Bulk Selection Bar -->
+                <div class="bulk-actions-bar" id="bulk-bar" style="display: none;">
+                    <div class="bulk-info" id="bulk-info">Đang chọn: 0 SIM</div>
+                    <div class="bulk-buttons">
+                        <button id="bulk-copy" class="btn-secondary">Copy tất cả</button>
+                        <button id="bulk-mark-used" class="btn-secondary">Đã dùng</button>
+                        <button id="bulk-mark-unused" class="btn-secondary">Chưa dùng</button>
+                        <button id="bulk-delete" class="btn-secondary btn-danger">Xóa</button>
+                    </div>
+                </div>
+
+                <!-- SIM Grid -->
+                <div class="sim-grid" id="sims-grid"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
