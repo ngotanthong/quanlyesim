@@ -52,7 +52,7 @@ body {
     padding: 1.5rem;
     overflow-x: hidden;
     line-height: 1.5;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 /* Scrollbar */
@@ -532,7 +532,7 @@ textarea.form-control:focus {
 
 /* SIM Number */
 .sim-number-display {
-    font-size: 1rem;
+    font-size: 1.15rem;
     font-weight: 600;
     letter-spacing: 0.02em;
     color: var(--text-primary);
