@@ -145,14 +145,15 @@ header p {
 
 /* ─── Dashboard Grid ──────────────────── */
 .dashboard-grid {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column-reverse;
     gap: 1rem;
     margin-bottom: 1.5rem;
 }
 
 @media (min-width: 1024px) {
     .dashboard-grid {
+        display: grid;
         grid-template-columns: 340px 1fr;
     }
 }
