@@ -1,6 +1,6 @@
 // CẤU HÌNH LIÊN KẾT CLOUD GOOGLE SHEETS MẶC ĐỊNH (KHÔNG BẮT BUỘC)
 // Anh có thể dán link Web App Apps Script vào đây để khi mở web ở bất kỳ đâu/bất kỳ máy nào cũng tự động nhận link mà không cần nhập lại.
-const DEFAULT_CLOUD_API_URL = 'https://script.google.com/macros/s/AKfycby9ysRHrv4wk9i41iclQAY6QixL5kyDCOj756cK4SKkkOGDKsPd4PTZsUjd67rA7XxeoQ/exec';
+const DEFAULT_CLOUD_API_URL = 'https://script.google.com/macros/s/AKfycbzK8AL_mj3wO-tr2emPecEwVNsyPPefoXrbnXzePZxb66ZqYXjH1p-i0UrDJ27wKW1Ijw/exec';
 
 // SIM State
 let sims = [];
