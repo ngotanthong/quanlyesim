@@ -888,3 +888,125 @@ select.search-input {
     background-position: right 0.5rem center;
     padding-right: 1.5rem;
 }
+
+/* ─── Login Gate ──────────────────────── */
+html:not(.authed) body {
+    overflow: hidden;
+}
+
+html:not(.authed) .container,
+html:not(.authed) .toast-container {
+    display: none;
+}
+
+html.authed .login-gate {
+    display: none;
+}
+
+.login-gate {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background:
+        radial-gradient(circle at 50% 0%, rgba(79, 143, 247, 0.12), transparent 55%),
+        var(--bg-main);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 340px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    padding: 2rem 1.5rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
+.login-icon {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--accent-subtle);
+    color: var(--accent);
+    margin-bottom: 0.85rem;
+}
+
+.login-card h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.login-card p {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 0.15rem;
+}
+
+#login-form {
+    width: 100%;
+    margin-top: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.login-input {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: 0.6rem 0.75rem;
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    text-align: center;
+    letter-spacing: 0.05em;
+    transition: var(--transition);
+}
+
+.login-input::placeholder {
+    color: var(--text-muted);
+    letter-spacing: normal;
+}
+
+.login-input:focus {
+    outline: none;
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px var(--accent-subtle);
+}
+
+.login-btn {
+    width: 100%;
+    justify-content: center;
+}
+
+.login-error {
+    min-height: 0.9rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--red);
+}
+
+.login-gate.shake .login-card {
+    animation: loginShake 0.4s ease;
+}
+
+@keyframes loginShake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(5px); }
+}

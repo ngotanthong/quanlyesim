@@ -2,12 +2,15 @@
 // Anh có thể dán link Web App Apps Script vào đây để khi mở web ở bất kỳ đâu/bất kỳ máy nào cũng tự động nhận link mà không cần nhập lại.
 const DEFAULT_CLOUD_API_URL = 'https://script.google.com/macros/s/AKfycbzK8AL_mj3wO-tr2emPecEwVNsyPPefoXrbnXzePZxb66ZqYXjH1p-i0UrDJ27wKW1Ijw/exec';
 
+// MÃ TRUY CẬP ĐỂ VÀO HỆ THỐNG
+const ACCESS_CODE = 'Ntt1998';
+
 // SIM State
 let sims = [];
 let selectedSimIds = new Set();
 let currentFilterType = 'esim'; // 'all', 'esim', 'physical'
 let currentFilterStatus = 'available'; // 'all', 'available', 'used'
-let currentSortMode = 'asc'; // 'asc', 'desc', 'newest'
+let currentSortMode = 'oldest'; // 'oldest', 'newest', 'asc', 'desc'
 let searchQuery = '';
 
 // History State
@@ -32,13 +35,67 @@ const cloudApiInput = document.getElementById('cloud-api-url');
 const cloudAutoCheckbox = document.getElementById('cloud-auto-sync');
 const cloudStatusSpan = document.getElementById('cloud-sync-status');
 
+// Login Elements
+const loginGate = document.getElementById('login-gate');
+const loginForm = document.getElementById('login-form');
+const loginInput = document.getElementById('login-input');
+const loginError = document.getElementById('login-error');
+
 // Stats Elements
 const statTotalAvailable = document.getElementById('stat-total-available');
 const statEsimAvailable = document.getElementById('stat-esim-available');
 const statPhysicalAvailable = document.getElementById('stat-physical-available');
 
+// Kiểm tra phiên đăng nhập (dùng sessionStorage: đóng tab là phải nhập lại mã)
+function isAuthenticated() {
+    return sessionStorage.getItem('quanlysim_auth') === 'granted';
+}
+
 // Init Application
 document.addEventListener('DOMContentLoaded', () => {
+    setupLogin();
+
+    if (isAuthenticated()) {
+        unlockApp();
+    } else {
+        if (loginInput) loginInput.focus();
+    }
+});
+
+// Gắn sự kiện cho màn hình đăng nhập
+function setupLogin() {
+    if (!loginForm) return;
+
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const code = loginInput.value.trim();
+
+        if (code === ACCESS_CODE) {
+            sessionStorage.setItem('quanlysim_auth', 'granted');
+            loginError.textContent = '';
+            loginInput.value = '';
+            unlockApp();
+        } else {
+            loginError.textContent = 'Mã truy cập không đúng!';
+            loginInput.value = '';
+            loginInput.focus();
+            loginGate.classList.remove('shake');
+            // Ép reflow để animation chạy lại được nhiều lần
+            void loginGate.offsetWidth;
+            loginGate.classList.add('shake');
+        }
+    });
+}
+
+// Mở khóa ứng dụng sau khi đăng nhập thành công
+let appInitialized = false;
+function unlockApp() {
+    document.documentElement.classList.add('authed');
+    if (loginGate) loginGate.classList.remove('shake');
+
+    if (appInitialized) return;
+    appInitialized = true;
+
     loadData();
     loadHistory();
     loadCloudSettings();
@@ -49,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (cloudAutoSync && cloudApiUrl) {
         pullFromCloud(true);
     }
-});
+}
 
 // Load data from LocalStorage
 function loadData() {
@@ -830,6 +887,8 @@ function renderList() {
         });
     } else if (currentSortMode === 'newest') {
         filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    } else if (currentSortMode === 'oldest') {
+        filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
     }
 
     if (filtered.length === 0) {
