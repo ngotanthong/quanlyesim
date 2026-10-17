@@ -3,7 +3,7 @@
 const DEFAULT_CLOUD_API_URL = 'https://script.google.com/macros/s/AKfycbzK8AL_mj3wO-tr2emPecEwVNsyPPefoXrbnXzePZxb66ZqYXjH1p-i0UrDJ27wKW1Ijw/exec';
 
 // MÃ TRUY CẬP ĐỂ VÀO HỆ THỐNG
-const ACCESS_CODE = 'Ntt1998';
+const ACCESS_CODE = 'Ntt@1998';
 
 // SIM State
 let sims = [];
