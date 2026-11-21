@@ -485,6 +485,39 @@ textarea.form-control:focus {
 /* No decorative ::after glow */
 .sim-card::after { display: none; }
 
+/* Date separator (chia lưới theo ngày) */
+.date-separator {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 0.75rem;
+    margin-bottom: 0.25rem;
+}
+
+.date-separator:first-child {
+    margin-top: 0;
+}
+
+.date-separator-text {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-subtle);
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+}
+
+.date-separator::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-subtle);
+}
+
 /* Card Header */
 .sim-card-header {
     display: flex;

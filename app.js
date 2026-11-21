@@ -10,7 +10,7 @@ let sims = [];
 let selectedSimIds = new Set();
 let currentFilterType = 'esim'; // 'all', 'esim', 'physical'
 let currentFilterStatus = 'available'; // 'all', 'available', 'used'
-let currentSortMode = 'oldest'; // 'oldest', 'newest', 'asc', 'desc'
+let currentSortMode = 'date_asc'; // 'oldest', 'newest', 'asc', 'desc', 'date_asc', 'date_desc'
 let searchQuery = '';
 
 // History State
@@ -889,6 +889,32 @@ function renderList() {
         filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     } else if (currentSortMode === 'oldest') {
         filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    } else if (currentSortMode === 'date_asc') {
+        // Chia lưới theo ngày: ngày cũ → mới, trong cùng ngày số thấp → cao
+        filtered.sort((a, b) => {
+            const dateCompare = new Date(a.createdAt) - new Date(b.createdAt);
+            if (dateCompare !== 0) return dateCompare;
+            try {
+                const numA = BigInt(a.number.replace(/\D/g, ''));
+                const numB = BigInt(b.number.replace(/\D/g, ''));
+                return numA < numB ? -1 : (numA > numB ? 1 : 0);
+            } catch (e) {
+                return a.number.localeCompare(b.number, undefined, { numeric: true, sensitivity: 'base' });
+            }
+        });
+    } else if (currentSortMode === 'date_desc') {
+        // Chia lưới theo ngày: ngày mới → cũ, trong cùng ngày số thấp → cao
+        filtered.sort((a, b) => {
+            const dateCompare = new Date(b.createdAt) - new Date(a.createdAt);
+            if (dateCompare !== 0) return dateCompare;
+            try {
+                const numA = BigInt(a.number.replace(/\D/g, ''));
+                const numB = BigInt(b.number.replace(/\D/g, ''));
+                return numA < numB ? -1 : (numA > numB ? 1 : 0);
+            } catch (e) {
+                return a.number.localeCompare(b.number, undefined, { numeric: true, sensitivity: 'base' });
+            }
+        });
     }
 
     if (filtered.length === 0) {
@@ -906,7 +932,22 @@ function renderList() {
 
     simsGrid.innerHTML = '';
 
+    // Khi ở chế độ chia lưới theo ngày, chèn dấu phân cách ngày
+    const showDateSeparator = (currentSortMode === 'date_asc' || currentSortMode === 'date_desc');
+    let lastDateKey = null;
+
     filtered.forEach(sim => {
+        if (showDateSeparator) {
+            const dateKey = getDateKey(sim.createdAt);
+            if (dateKey !== lastDateKey) {
+                lastDateKey = dateKey;
+                const separator = document.createElement('div');
+                separator.className = 'date-separator';
+                separator.innerHTML = `<span class="date-separator-text">${formatCardDate(sim.createdAt)}</span>`;
+                simsGrid.appendChild(separator);
+            }
+        }
+
         const isSelected = selectedSimIds.has(sim.id);
         const card = document.createElement('div');
         card.className = `sim-card animate-fade-in ${sim.used ? 'used' : ''}`;
@@ -1014,6 +1055,16 @@ function formatCardDate(isoString) {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
+}
+
+// Lấy key ngày (yyyy-mm-dd) để phân nhóm lưới theo ngày
+function getDateKey(isoString) {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`;
 }
 
 // Copy và đánh dấu Đã Sử Dụng SIM đồng thời (⚡ Copy & Dùng)
